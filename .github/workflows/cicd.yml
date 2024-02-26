@@ -14,7 +14,7 @@ on:
           - name: Login to Docker Hub
             uses: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
           - name: Build Docker Image
-            run: docker build -t zeldacamila/testing-dns
+            run: docker build -t zeldacamila/testing-dns .
           - name: Publish image to docker hub
             run: docker push zeldacamila/testing-dns:latest
 
