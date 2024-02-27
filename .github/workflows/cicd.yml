@@ -5,26 +5,26 @@ on:
     branches:
       - deploy-to-ec2
 
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout Source
-            uses: actions/checkout@v3
-          - name: Login to Docker Hub
-            uses: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          - name: Build Docker Image
-            run: docker build -t zeldacamila/testing-dns .
-          - name: Publish image to docker hub
-            run: docker push zeldacamila/testing-dns:latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker Image
+        run: docker build -t zeldacamila/testing-dns .
+      - name: Publish image to docker hub
+        run: docker push zeldacamila/testing-dns:latest
 
-      deploy:
-        needs: build
-        runs-on: aws-ec2
-        steps:
-          - name: Pull images from docker hub
-            run: docker pull zeldacamila/testing-dns:latest
-          - name: Delete Old Container
-            run: docker rm -f frontendContainer
-          - name: Run docker container
-            run: docker run -d -p 3000:80 --name frontendContainer zeldacamila/testing-dns:latest
+  deploy:
+    needs: build
+    runs-on: aws-ec2
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull zeldacamila/testing-dns:latest
+      - name: Delete Old Container
+        run: docker rm -f frontendContainer
+      - name: Run docker container
+        run: docker run -d -p 3000:80 --name frontendContainer integrationninjas/reactjs-app
